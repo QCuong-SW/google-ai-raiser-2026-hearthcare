@@ -1,0 +1,51 @@
+services:
+  # 1. PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: lifelink-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: lifelink
+      POSTGRES_PASSWORD: lifelink_secret_password
+      POSTGRES_DB: lifelink_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lifelink -d lifelink_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 2. NestJS Backend API
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: lifelink-server
+    restart: always
+    environment:
+      PORT: 3001
+      DATABASE_URL: postgresql://lifelink:lifelink_secret_password@postgres:5432/lifelink_db
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-""}
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # 3. React Vite Mobile-First Client (Nginx)
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: lifelink-client
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+
+volumes:
+  postgres_data:

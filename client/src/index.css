@@ -1,0 +1,329 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+@layer base {
+  :root {
+    --primary: #0284c7;
+    --primary-hover: #0369a1;
+    --emergency: #dc2626;
+    --emergency-glow: rgba(220, 38, 38, 0.4);
+  }
+}
+
+/* Base Body Styles */
+body {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* ----------------------------------------------------
+   DARK MODE (Default: Sky Blue / Cyan Cool Vibe)
+   ---------------------------------------------------- */
+body, body.dark {
+  background-color: #090d16;
+  color: #f8fafc;
+}
+
+body.dark .glass-panel {
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+body.dark .theme-accent-bg {
+  background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%) !important;
+  color: #ffffff !important;
+  border-color: #38bdf8 !important;
+}
+
+body.dark .theme-accent-text {
+  color: #38bdf8 !important;
+}
+
+body.dark .brand-title-text {
+  color: #38bdf8 !important;
+}
+
+body.dark .theme-accent-hover:hover {
+  background-color: rgba(56, 189, 248, 0.15) !important;
+  color: #38bdf8 !important;
+}
+
+body.dark header {
+  background: rgba(15, 23, 42, 0.95) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+body.dark .map-loading-overlay {
+  background-color: rgba(9, 13, 22, 0.92) !important;
+  color: #ffffff !important;
+}
+
+body.dark .radar-ring {
+  background-color: rgba(56, 189, 248, 0.1) !important;
+  border: 2px solid rgba(56, 189, 248, 0.4) !important;
+}
+
+body.dark .progress-bar-fill {
+  background: linear-gradient(90deg, #0284c7 0%, #38bdf8 100%) !important;
+}
+
+body.dark .emergency-contact-box {
+  background-color: rgba(69, 10, 10, 0.4) !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+}
+
+body.dark .emergency-contact-title {
+  color: #f87171 !important;
+}
+
+/* ----------------------------------------------------
+   LIGHT MODE (100% High Contrast Bright White & Fresh Mint Theme)
+   ---------------------------------------------------- */
+body.light {
+  background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 40%, #ffffff 100%);
+  background-attachment: fixed;
+  color: #0f172a;
+}
+
+/* Brand Title Color in Light Mode - Guaranteed Green */
+body.light .brand-title-text {
+  color: #059669 !important;
+}
+
+/* Glass Panel in Light Mode */
+body.light .glass-panel {
+  background: rgba(255, 255, 255, 0.98) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(16, 185, 129, 0.3) !important;
+  box-shadow: 0 10px 30px -5px rgba(5, 150, 105, 0.08) !important;
+}
+
+/* Sidebar Toggle Button Override in Light Mode - Solid Emerald Green with White Icon */
+body.light .sidebar-toggle-btn {
+  background-color: #059669 !important;
+  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid #10b981 !important;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.35) !important;
+}
+
+body.light .sidebar-toggle-btn * {
+  color: #ffffff !important;
+}
+
+/* Ensure all Headings and Card Titles are Dark Black/Slate in Light Mode */
+body.light h1,
+body.light h2,
+body.light h3,
+body.light h4,
+body.light h5,
+body.light h6 {
+  color: #022c22 !important;
+}
+
+/* ABSOLUTE GUARANTEE: OVERRIDE ANY DARK SLATE CLASSES IN LIGHT MODE TO WHITE OR MINT */
+body.light .bg-slate-950,
+body.light .bg-slate-900,
+body.light .bg-slate-800,
+body.light .bg-slate-700,
+body.light [class*="bg-slate-9"],
+body.light [class*="bg-slate-8"] {
+  background-color: #f0fdf4 !important;
+  color: #022c22 !important;
+  border-color: #6ee7b7 !important;
+}
+
+body.light [class*="text-slate-1"],
+body.light [class*="text-slate-2"],
+body.light [class*="text-slate-3"],
+body.light [class*="text-slate-4"],
+body.light [class*="text-slate-5"] {
+  color: #0f172a !important;
+}
+
+/* High-Contrast Emergency Contact Box in Light Mode */
+body.light .emergency-contact-box {
+  background-color: #fff1f2 !important;
+  border-color: #fecdd3 !important;
+  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.06) !important;
+}
+
+body.light .emergency-contact-title {
+  color: #9f1239 !important;
+}
+
+body.light .emergency-contact-box input[type="text"] {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #fda4af !important;
+}
+
+/* Sidebar Bottom Container in Light Mode (Soft Mint Background) */
+body.light .sidebar-bottom-container {
+  background-color: #ecfdf5 !important;
+  border-top: 1px solid rgba(16, 185, 129, 0.25) !important;
+}
+
+body.light .sidebar-bottom-container > div {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(16, 185, 129, 0.3) !important;
+}
+
+body.light .map-loading-overlay {
+  background-color: rgba(240, 253, 244, 0.96) !important;
+  color: #064e3b !important;
+}
+
+body.light .map-loading-overlay h3 {
+  color: #064e3b !important;
+}
+
+body.light .radar-ring {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+  border: 2px solid rgba(16, 185, 129, 0.5) !important;
+}
+
+body.light .progress-bar-fill {
+  background: linear-gradient(90deg, #059669 0%, #10b981 100%) !important;
+}
+
+body.light .theme-accent-bg {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+  color: #ffffff !important;
+  border-color: #10b981 !important;
+}
+
+body.light .theme-accent-text {
+  color: #059669 !important;
+}
+
+body.light .theme-accent-hover:hover {
+  background-color: #d1fae5 !important;
+  color: #047857 !important;
+}
+
+/* Soothing Deep Emerald Top Navbar in Light Mode */
+body.light header {
+  background: linear-gradient(135deg, #064e3b 0%, #047857 100%) !important;
+  color: #ffffff !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 4px 20px rgba(6, 78, 59, 0.15) !important;
+}
+
+body.light header * {
+  color: #ffffff !important;
+}
+
+body.light header .text-slate-400 {
+  color: #a7f3d0 !important;
+}
+
+body.light header button:hover {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Sidebar in Light Mode */
+body.light aside {
+  background: rgba(255, 255, 255, 0.97) !important;
+  border-right: 1px solid rgba(16, 185, 129, 0.25) !important;
+}
+
+/* Input Box in Light Mode with Emerald Focus Ring */
+body.light input[type="text"],
+body.light select {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: rgba(16, 185, 129, 0.35) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+}
+
+body.light input[type="text"]:focus,
+body.light select:focus {
+  border-color: #059669 !important;
+  outline: 2px solid rgba(5, 150, 105, 0.3) !important;
+}
+
+body.light input[type="text"]::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Emergency Red Modal remains vibrant red */
+.glass-emergency {
+  background: rgba(153, 27, 27, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(248, 113, 113, 0.4);
+}
+
+.glass-emergency * {
+  color: #ffffff !important;
+}
+
+/* Emergency Beacon Pulse Animation */
+@keyframes beacon-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.8);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 18px rgba(220, 38, 38, 0);
+    transform: scale(1.03);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
+    transform: scale(1);
+  }
+}
+
+.animate-beacon {
+  animation: beacon-pulse 1.8s infinite ease-in-out;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(16, 185, 129, 0.4);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(16, 185, 129, 0.7);
+}
+
+/* Leaflet Map Theme overrides */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  z-index: 1;
+}
+
+body.dark .leaflet-tile {
+  filter: brightness(0.7) invert(1) contrast(1.2) hue-rotate(200deg) saturate(0.3);
+}
+
+body.light .leaflet-tile {
+  filter: none !important;
+}
+
+.leaflet-popup-content-wrapper {
+  background: rgba(255, 255, 255, 0.95) !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  backdrop-filter: blur(10px);
+}
+.leaflet-popup-tip {
+  background: rgba(255, 255, 255, 0.95) !important;
+}
