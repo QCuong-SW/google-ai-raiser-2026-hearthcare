@@ -132,14 +132,3 @@ docker-compose up --build
 | **User** | `user@lifelink.ai` | `123456` | Người dùng Y tế, Chat AI Triage, Lưu Hồ sơ Y tế |
 
 ---
-
-## 6. Giấy Phép & Bảo Mật (Security & License)
-
-- File `.env` chứa `GEMINI_API_KEY` được bảo vệ nghiêm ngặt qua `.gitignore`.
-- Dữ liệu mật khẩu người dùng được băm mã hóa bằng `bcrypt` (10 rounds).
-- Toàn bộ giao dịch API được bảo vệ bởi Passport JWT Guard & RolesGuard.
-
----
-
-**LifeLink AI - Life Saved in Seconds.**  
-*Phát triển cho Startup Pitching MVP tại TP. Hồ Chí Minh.*
