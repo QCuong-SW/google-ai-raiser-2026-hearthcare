@@ -1,75 +1,85 @@
-# LifeLink AI - System Triage Y Tế & Xếp Hạng Bệnh Viện 24/7 (Quận Bình Thạnh)
+# LifeLink AI - 24/7 Medical Triage & Hospital Ranking System (Binh Thanh District)
 
-> **LifeLink AI** là hệ thống phân loại triệu chứng y tế khẩn cấp thông minh sử dụng **Google Gemini 3.6 Flash Multimodal Vision AI** kết hợp với **Thuật toán xếp hạng 5 yếu tố bệnh viện** tối ưu riêng cho địa bàn **Quận Bình Thạnh, TP. Hồ Chí Minh**.
+> **LifeLink AI** is an intelligent emergency medical symptom triage system that uses **Google Gemini 3.6 Flash Multimodal Vision AI**, combined with a **5-factor Hospital Ranking Algorithm** optimized specifically for **Binh Thanh District, Ho Chi Minh City**.
 
 ---
 
-## 1. Tính Năng Nổi Bật (Key Features)
+## 1. Key Features
 
 ### 1.1. Google Gemini 3.6 Flash Multimodal Vision AI Triage
-- **3 Chế độ AI độc lập (Animated Model Picker Dropdown)**:
-  - **Tìm nơi khám & Bệnh viện**: Phân loại mức độ Triage và gợi ý bệnh viện phù hợp nhất.
-  - **Phân tích triệu chứng**: Chẩn đoán lâm sàng sâu, nguyên nhân rủi ro và khuyên dùng bác sĩ chuyên khoa.
-  - **Sơ cứu với triệu chứng**: Hướng dẫn thao tác sơ cứu khẩn cấp từng bước (`Bước 1`, `Bước 2`, `Bước 3`) & chống chỉ định nguy hiểm.
-- **Tích hợp Vision AI đa phương thức**: Hỗ trợ dán ảnh trực tiếp từ Clipboard (`Ctrl + V`) hoặc tải ảnh lâm sàng (Mẩn ngứa, vết thương, toa thuốc, kết quả xét nghiệm).
-- **Bộ nhớ AI 5-Turn Context Memory**: Tự động lưu và duy trì ngữ cảnh 5 câu hội thoại gần nhất trong Database giúp AI phản hồi liền mạch.
 
-### 1.2. Thuật Toán Xếp Hạng 5 Yếu Tố Bệnh Viện Bình Thạnh
-Xếp hạng danh sách 8 Bệnh viện tuyến đầu tại Quận Bình Thạnh (Nhân dân Gia Định, Vinmec Central Park, Ung Bướu TP.HCM, Bệnh viện Quận Bình Thạnh...) dựa trên công thức trọng số 5 yếu tố:
-$$\text{Score} = (w_1 \cdot \text{Khoảng cách GPS}) + (w_2 \cdot \text{Cấp cứu 24/7}) + (w_3 \cdot \text{Khớp Chuyên khoa}) + (w_4 \cdot \text{Đánh giá ⭐}) + (w_5 \cdot \text{BHYT})$$
+* **3 Independent AI Modes (Animated Model Picker Dropdown)**:
 
-### 1.3. Cấp Cứu Khẩn Cấp 1-Tap Bypass
-- Tự động phát hiện các triệu chứng đe dọa tính mạng (Đau ngực dữ dội, Đột quỵ, Khó thở, Tê nửa người...) để kích hoạt giao diện **Cấp cứu khẩn cấp 1-Tap**, hiển thị số hotline bệnh viện và nút chỉ đường tức thì.
+  * **Find Medical Facilities & Hospitals**: Classifies the triage severity level and recommends the most suitable hospital.
+  * **Symptom Analysis**: Provides in-depth clinical analysis, potential risk causes, and recommends the appropriate medical specialist.
+  * **First Aid for Symptoms**: Provides step-by-step emergency first-aid instructions (`Step 1`, `Step 2`, `Step 3`) and dangerous contraindications.
+* **Multimodal Vision AI Integration**: Supports directly pasting images from the Clipboard (`Ctrl + V`) or uploading clinical images (rashes, wounds, prescriptions, test results).
+* **5-Turn AI Context Memory**: Automatically stores and maintains the context of the 5 most recent conversation turns in the Database to provide continuous and coherent AI responses.
 
-### 1.4. Định Vị GPS Vị Trí Thực & Bản Đồ Google Maps
-- Tích hợp HTML5 High Accuracy Geolocation lấy vị trí GPS thực tế trên thiết bị của người dùng.
-- Bản đồ Vector HD (Google Maps Vector, Vệ Tinh, Dark Mode) với chức năng 1-Click dẫn đường sang Google Maps.
+### 1.2. 5-Factor Hospital Ranking Algorithm for Binh Thanh District
 
-### 1.5. Giao Diện ChatGPT-Style & Quản Lý Đoạn Chat
-- Dropdown chuyển đổi chế độ AI với hiệu ứng nảy `Spring Pop-out` (`cubic-bezier(0.34, 1.56, 0.64, 1)`).
-- Tự động đặt tên đoạn chat trên Sidebar theo Prompt đầu tiên của người dùng.
-- Cây thư mục đoạn chat trên Sidebar cho phép xem lại lịch sử hoặc xóa cuộc hội thoại.
+Ranks a list of 8 leading hospitals in Binh Thanh District (Gia Dinh People's Hospital, Vinmec Central Park, Ho Chi Minh City Oncology Hospital, Binh Thanh District Hospital...) based on a weighted formula consisting of 5 factors:
+
+$$\text{Score} = (w_1 \cdot \text{GPS Distance}) + (w_2 \cdot \text{24/7 Emergency Service}) + (w_3 \cdot \text{Specialty Match}) + (w_4 \cdot \text{Rating }) + (w_5 \cdot \text{Health Insurance})$$
+
+### 1.3. 1-Tap Emergency Bypass
+
+* Automatically detects life-threatening symptoms (severe chest pain, stroke, difficulty breathing, unilateral numbness...) to activate the **1-Tap Emergency** interface, displaying the hospital emergency hotline and an instant navigation button.
+
+### 1.4. Real-Time GPS Location & Google Maps Integration
+
+* Integrates HTML5 High Accuracy Geolocation to obtain the user's actual GPS location from their device.
+* HD Vector Map (Google Maps Vector, Satellite, Dark Mode) with 1-Click navigation to Google Maps.
+
+### 1.5. ChatGPT-Style Interface & Chat Management
+
+* AI mode switching dropdown with a `Spring Pop-out` animation (`cubic-bezier(0.34, 1.56, 0.64, 1)`).
+* Automatically generates chat titles in the Sidebar based on the user's first prompt.
+* A chat folder tree in the Sidebar allows users to review chat history or delete conversations.
 
 ---
 
-## 2. Công Nghệ Sử Dụng (Tech Stack)
+## 2. Technology Stack
 
 ### Frontend (Client)
-- **Core**: React 18, TypeScript, Vite
-- **Styling**: Vanilla CSS, TailwindCSS, Glassmorphism Design
-- **Icons & Maps**: Lucide React, Leaflet, React-Leaflet
+
+* **Core**: React 18, TypeScript, Vite
+* **Styling**: Vanilla CSS, TailwindCSS, Glassmorphism Design
+* **Icons & Maps**: Lucide React, Leaflet, React-Leaflet
 
 ### Backend (Server)
-- **Framework**: NestJS (Kiến trúc Package-by-Feature)
-- **AI Engine**: `@google/genai` SDK (Google Gemini 3.6 Flash Vision AI)
-- **Authentication**: Passport JWT (Mã JWT hạn 7 ngày), Bcrypt password hashing
-- **Security & Authorization**: Custom Decorators (`@Roles()`), RolesGuard (Admin / User)
+
+* **Framework**: NestJS (Package-by-Feature Architecture)
+* **AI Engine**: `@google/genai` SDK (Google Gemini 3.6 Flash Vision AI)
+* **Authentication**: Passport JWT (7-day JWT expiration), Bcrypt password hashing
+* **Security & Authorization**: Custom Decorators (`@Roles()`), RolesGuard (Admin / User)
 
 ### Database & Containerization
-- **Database**: PostgreSQL 16 (Hỗ trợ SQLite `better-sqlite3` fallback zero-config)
-- **ORM**: TypeORM v0.3
-- **Container**: Docker, Docker-Compose
+
+* **Database**: PostgreSQL 16 (Supports SQLite `better-sqlite3` zero-config fallback)
+* **ORM**: TypeORM v0.3
+* **Container**: Docker, Docker-Compose
 
 ---
 
-## 3. Cấu Trúc Thư Mục Dự Án (Project Structure)
+## 3. Project Structure
 
 ```text
 lifelink-ai/
-├── docker-compose.yml          # Containerization cho PostgreSQL & NestJS
-├── README.md                   # Tài liệu hướng dẫn dự án
+├── docker-compose.yml          # Containerization for PostgreSQL & NestJS
+├── README.md                   # Project documentation
 │
 ├── client/                     # Frontend React (Vite)
 │   ├── src/
 │   │   ├── components/         # MapView, Navbar, Sidebar, EmergencyModal, ScoreBreakdownModal
 │   │   ├── pages/              # ChatPage, HospitalsPage, ProfilePage, ContactPage
 │   │   ├── services/           # api.ts (Fetch & Triage API Client)
-│   │   └── App.tsx                # Main Layout & Tab Routing
+│   │   └── App.tsx             # Main Layout & Tab Routing
 │   └── package.json
 │
 └── server/                     # Backend NestJS (Package-by-Feature)
     ├── .env                    # GEMINI_API_KEY, PORT=3001, JWT_SECRET
-    ├── init-schema.sql         # PostgreSQL DDL & Seed Data 8 Bệnh viện Bình Thạnh
+    ├── init-schema.sql         # PostgreSQL DDL & Seed Data for 8 Binh Thanh District Hospitals
     ├── src/
     │   ├── main.ts             # NestJS Bootstrap (Port 3001)
     │   ├── app.module.ts       # Root Module & TypeORM DB Config
@@ -85,61 +95,57 @@ lifelink-ai/
 
 ---
 
-## 4. Hướng Dẫn Cài Đặt & Khởi Chạy (Getting Started)
+## 4. Getting Started
 
-### Yêu cầu môi trường (Prerequisites)
-- **Node.js**: v18.0.0 trở lên
-- **npm**: v9.0.0 trở lên
-- **Google Gemini API Key** (Lấy miễn phí tại [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey))
+### Prerequisites
+
+* **Node.js**: v18.0.0 or higher
+* **npm**: v9.0.0 or higher
+* **Google Gemini API Key** (Get one for free at [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey))
 
 ---
 
-### Cách 1: Khởi chạy Cục bộ (Local Development)
+### Method 1: Local Development
 
-#### 1. Khởi chạy Backend (NestJS Server):
+#### 1. Start the Backend (NestJS Server):
+
 ```bash
 cd server
 npm install
 npm run start
 ```
-*Server API sẽ chạy tại:* `http://localhost:3001`
 
-#### 2. Khởi chạy Frontend (React Client):
-Mở một cửa sổ Terminal mới:
+*The Server API will run at:* `http://localhost:3001`
+
+#### 2. Start the Frontend (React Client):
+
+Open a new Terminal window:
+
 ```bash
 cd client
 npm install
 npm run dev
 ```
-*Giao diện Web sẽ chạy tại:* `http://localhost:5173`
+
+*The Web Interface will run at:* `http://localhost:5173`
 
 ---
 
-### Cách 2: Khởi chạy bằng Docker (Docker Compose)
+### Method 2: Docker (Docker Compose)
 
-Khởi chạy đồng thời **PostgreSQL Database** và **NestJS Backend**:
+Start **PostgreSQL Database** and **NestJS Backend** simultaneously:
+
 ```bash
 docker-compose up --build
 ```
 
 ---
 
-## 5. Tài Khoản Thử Nghiệm (Default Test Accounts)
+## 5. Default Test Accounts
 
-| Vai trò (Role) | Email | Mật khẩu (Password) | Quyền hạn |
-| :--- | :--- | :--- | :--- |
-| **Admin** | `admin@lifelink.ai` | `123456` | Toàn quyền Thêm/Sửa Bệnh viện & Xem Ý kiến phản hồi |
-| **User** | `user@lifelink.ai` | `123456` | Người dùng Y tế, Chat AI Triage, Lưu Hồ sơ Y tế |
-
----
-
-## 6. Giấy Phép & Bảo Mật (Security & License)
-
-- File `.env` chứa `GEMINI_API_KEY` được bảo vệ nghiêm ngặt qua `.gitignore`.
-- Dữ liệu mật khẩu người dùng được băm mã hóa bằng `bcrypt` (10 rounds).
-- Toàn bộ giao dịch API được bảo vệ bởi Passport JWT Guard & RolesGuard.
+| Role      | Email               | Password | Permissions                                           |
+| :-------- | :------------------ | :------- | :---------------------------------------------------- |
+| **Admin** | `admin@lifelink.ai` | `123456` | Full access to Add/Edit Hospitals & View Feedback     |
+| **User**  | `user@lifelink.ai`  | `123456` | Medical User, AI Triage Chat, Medical Profile Storage |
 
 ---
-
-**LifeLink AI - Life Saved in Seconds.**  
-*Phát triển cho Startup Pitching MVP tại TP. Hồ Chí Minh.*
