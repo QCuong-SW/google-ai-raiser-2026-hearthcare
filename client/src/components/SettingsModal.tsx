@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Settings, User, ShieldCheck, Heart, AlertCircle, Phone, Cpu, Moon, Sun, Bell, CheckCircle2 } from 'lucide-react';
+import { X, Settings, User, ShieldCheck, Heart, AlertCircle, Phone, Moon, Sun, Bell, CheckCircle2 } from 'lucide-react';
 import type { MedicalProfile } from '../types';
 import { fetchMedicalProfile } from '../services/api';
 
@@ -11,7 +11,7 @@ interface SettingsModalProps {
 }
 
 export const SettingsModal = ({ isOpen, onClose, theme, onToggleTheme }: SettingsModalProps) => {
-  const [activeTab, setActiveTab] = useState<'profile' | 'general' | 'system'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'general'>('profile');
   const [savedSuccess, setSavedSuccess] = useState(false);
 
   const [profile, setProfile] = useState<MedicalProfile>({
@@ -39,7 +39,7 @@ export const SettingsModal = ({ isOpen, onClose, theme, onToggleTheme }: Setting
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
       {/* Settings Modal Box with Spring Zoom-In Animation */}
-      <div className="relative w-full max-w-2xl h-[560px] glass-panel rounded-3xl overflow-hidden border border-slate-700/80 shadow-2xl flex flex-col md:flex-row text-white animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
+      <div className="relative w-full max-w-2xl h-[520px] glass-panel rounded-3xl overflow-hidden border border-slate-700/80 shadow-2xl flex flex-col md:flex-row text-white animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
         
         {/* Left Sidebar inside Settings Modal */}
         <div className="w-full md:w-56 bg-slate-900/90 border-b md:border-b-0 md:border-r border-slate-800 p-3 flex flex-row md:flex-col gap-1.5 shrink-0">
@@ -51,7 +51,6 @@ export const SettingsModal = ({ isOpen, onClose, theme, onToggleTheme }: Setting
           {[
             { id: 'profile', label: 'Hồ sơ Y tế', icon: User },
             { id: 'general', label: 'Tùy chọn chung', icon: Moon },
-            { id: 'system', label: 'Hệ thống & AI', icon: Cpu },
           ].map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -141,7 +140,7 @@ export const SettingsModal = ({ isOpen, onClose, theme, onToggleTheme }: Setting
                   />
                 </div>
 
-                {/* Clean Emergency Contact Section with High-Contrast Light & Dark Styling */}
+                {/* Clean Emergency Contact Section */}
                 <div className="emergency-contact-box p-3.5 rounded-xl space-y-2 border">
                   <h4 className="text-[11px] font-bold uppercase flex items-center gap-1 emergency-contact-title">
                     <Phone className="w-3 h-3 text-red-500" /> Người liên hệ khẩn cấp
@@ -215,39 +214,6 @@ export const SettingsModal = ({ isOpen, onClose, theme, onToggleTheme }: Setting
                     <div className="text-[11px] text-slate-400">Cảnh báo khi AI phát hiện triệu chứng nguy cấp</div>
                   </div>
                   <input type="checkbox" defaultChecked className="w-4 h-4 accent-emerald-500 cursor-pointer" />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 3: System & AI Info */}
-          {activeTab === 'system' && (
-            <div className="space-y-4 animate-in fade-in slide-in-from-right-3 duration-200">
-              <div>
-                <h3 className="text-base font-bold text-white mb-1 flex items-center gap-2">
-                  <Cpu className="w-4 h-4 theme-accent-text" /> Thông tin Hệ thống & AI
-                </h3>
-                <p className="text-xs text-slate-400">Trạng thái kết nối Google Gemini API và Ranking Engine</p>
-              </div>
-
-              <div className="space-y-2.5 text-xs">
-                <div className="p-3.5 bg-slate-900 border border-slate-800 rounded-2xl flex justify-between items-center shadow-sm">
-                  <span className="text-slate-400">AI Model Engine:</span>
-                  <span className="font-mono text-sky-400 font-bold bg-sky-500/10 px-2 py-1 rounded-lg border border-sky-500/20">
-                    Gemini 2.5 Flash Structured
-                  </span>
-                </div>
-                <div className="p-3.5 bg-slate-900 border border-slate-800 rounded-2xl flex justify-between items-center shadow-sm">
-                  <span className="text-slate-400">Ranking Algorithm:</span>
-                  <span className="font-mono text-emerald-400 font-bold bg-emerald-500/10 px-2 py-1 rounded-lg border border-emerald-500/20">
-                    5-Factor Weighted Score v1.0
-                  </span>
-                </div>
-                <div className="p-3.5 bg-slate-900 border border-slate-800 rounded-2xl flex justify-between items-center shadow-sm">
-                  <span className="text-slate-400">Status Server NestJS:</span>
-                  <span className="font-bold text-emerald-400 flex items-center gap-1.5 bg-emerald-500/10 px-2 py-1 rounded-lg border border-emerald-500/20">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Online (Port 3001)
-                  </span>
                 </div>
               </div>
             </div>
