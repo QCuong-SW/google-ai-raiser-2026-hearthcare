@@ -1,7 +1,9 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards } from '@nestjs/common';
 import { GeminiService } from '../gemini/gemini.service';
 import { HospitalService } from '../hospital/hospital.service';
 import { ChatService } from '../chat/chat.service';
+import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
 @Controller('api/triage')
 export class TriageController {
@@ -11,8 +13,10 @@ export class TriageController {
     private readonly chatService: ChatService,
   ) {}
 
+  @UseGuards(OptionalJwtAuthGuard)
   @Post('analyze')
   async analyzeTriage(
+    @CurrentUser('id') userId: string | undefined,
     @Body()
     body: {
       symptomQuery: string;
@@ -45,20 +49,34 @@ export class TriageController {
     }
 
     // 2. Rank Bình Thạnh Hospitals based on specialties & emergency urgency
-    const hospitals = await this.hospitalService.searchAndRankHospitals(
+    const allHospitals = await this.hospitalService.searchAndRankHospitals(
       lat,
       lng,
       triage.specialty_needed,
       triage.is_emergency,
     );
 
-    // 3. Save message turn to database if session exists
+    // Limit to TOP 2 most relevant hospitals by default unless user asks for more
+    const lowerQuery = (body.symptomQuery || '').toLowerCase();
+    const wantsMoreHospitals =
+      lowerQuery.includes('thêm') ||
+      lowerQuery.includes('nhiều') ||
+      lowerQuery.includes('danh sách') ||
+      lowerQuery.includes('khác') ||
+      lowerQuery.includes('bệnh viện khác');
+
+    const hospitals = wantsMoreHospitals ? allHospitals.slice(0, 6) : allHospitals.slice(0, 2);
+
+    // 3. Save message turn to database if session exists (linked to logged-in user if available)
     if (body.sessionId) {
       await this.chatService.saveMessage(
         body.sessionId,
         'user',
         body.symptomQuery,
         body.imageUrl,
+        undefined,
+        undefined,
+        userId,
       );
       await this.chatService.saveMessage(
         body.sessionId,
@@ -67,6 +85,7 @@ export class TriageController {
         undefined,
         triage,
         mode === 'triage_hospital' ? hospitals : undefined,
+        userId,
       );
     }
 

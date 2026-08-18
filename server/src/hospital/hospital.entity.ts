@@ -3,41 +3,41 @@ import { Entity, PrimaryColumn, Column } from 'typeorm';
 @Entity('hospitals')
 export class HospitalEntity {
   @PrimaryColumn()
-  id: string;
+  id!: string;
 
   @Column()
-  name: string;
+  name!: string;
 
   @Column('text')
-  address: string;
+  address!: string;
 
   @Column('float')
-  latitude: number;
+  latitude!: number;
 
   @Column('float')
-  longitude: number;
+  longitude!: number;
 
   @Column()
-  phone: string;
+  phone!: string;
 
   @Column({ name: 'is_emergency_247', default: true })
-  isEmergency247: boolean;
+  isEmergency247!: boolean;
 
   @Column('simple-array')
-  specialties: string[];
+  specialties!: string[];
 
   @Column({ name: 'accepts_insurance', default: true })
-  acceptsInsurance: boolean;
+  acceptsInsurance!: boolean;
 
   @Column('float', { default: 4.8 })
-  rating: number;
+  rating!: number;
 
   @Column({ name: 'user_ratings_total', default: 1000 })
-  userRatingsTotal: number;
+  userRatingsTotal!: number;
 
-  @Column({ name: 'image_url', nullable: true })
-  imageUrl: string;
+  @Column({ type: 'text', name: 'image_url', nullable: true })
+  imageUrl!: string | null;
 
   @Column({ name: 'working_hours', default: 'Mở cửa 24/7' })
-  workingHours: string;
+  workingHours!: string;
 }

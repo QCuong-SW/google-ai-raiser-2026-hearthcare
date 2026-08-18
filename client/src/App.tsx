@@ -5,13 +5,15 @@ import { BottomNav } from './components/BottomNav';
 import { EmergencyModal } from './components/EmergencyModal';
 import { ScoreBreakdownModal } from './components/ScoreBreakdownModal';
 import { SettingsModal } from './components/SettingsModal';
+import { AuthModal } from './components/AuthModal';
 import { ChatPage } from './pages/ChatPage';
 import { HospitalsPage } from './pages/HospitalsPage';
 import { MapView } from './components/MapView';
 import { ProfilePage } from './pages/ProfilePage';
 import { ContactPage } from './pages/ContactPage';
-import type { Hospital } from './types';
-import { fetchEmergencyHospitals } from './services/api';
+import type { Hospital, AuthUser } from './types';
+import { fetchEmergencyHospitals, fetchCurrentUser, logoutUser, verifyEmailApi, resendVerificationApi, instantVerifyEmailApi } from './services/api';
+import { Mail, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
 
 export function App() {
   const [activeTab, setActiveTab] = useState<string>('chat');
@@ -19,18 +21,79 @@ export function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
 
-  // Light / Dark Theme State
-  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
-    return (localStorage.getItem('lifelink_theme') as 'dark' | 'light') || 'dark';
+  // Authentication State
+  const [user, setUser] = useState<AuthUser | null>(() => {
+    const saved = localStorage.getItem('lifelink_user');
+    return saved ? JSON.parse(saved) : null;
   });
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+
+  // Email Verification Banner & Alert Toast State
+  const [verifyNotice, setVerifyNotice] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
+  const [isResending, setIsResending] = useState(false);
 
   useEffect(() => {
-    document.body.className = theme;
-    localStorage.setItem('lifelink_theme', theme);
-  }, [theme]);
+    // 100% Permanently enforce Light Mode
+    document.documentElement.classList.remove('dark');
+    document.documentElement.classList.add('light');
+    document.body.className = 'light';
+    localStorage.removeItem('lifelink_theme');
 
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+    // Check if URL has ?verifyToken=...
+    const urlParams = new URLSearchParams(window.location.search);
+    const verifyToken = urlParams.get('verifyToken');
+
+    if (verifyToken) {
+      verifyEmailApi(verifyToken)
+        .then((res) => {
+          setVerifyNotice({ type: 'success', msg: res.message });
+          fetchCurrentUser().then((u) => {
+            if (u) setUser(u);
+          });
+          window.history.replaceState({}, document.title, window.location.pathname);
+        })
+        .catch((err) => {
+          setVerifyNotice({ type: 'error', msg: err.message });
+          window.history.replaceState({}, document.title, window.location.pathname);
+        });
+    } else {
+      fetchCurrentUser().then((u) => {
+        if (u) setUser(u);
+      });
+    }
+  }, []);
+
+  const handleResendEmail = async () => {
+    if (isResending) return;
+    setIsResending(true);
+    try {
+      const res = await resendVerificationApi();
+      setVerifyNotice({ type: 'success', msg: res.message });
+    } catch (err: any) {
+      setVerifyNotice({ type: 'error', msg: err.message || 'Không thể gửi lại email' });
+    } finally {
+      setIsResending(false);
+    }
+  };
+
+  const handleInstantVerify = async () => {
+    try {
+      const res = await instantVerifyEmailApi();
+      setVerifyNotice({ type: 'success', msg: res.message });
+      if (user) {
+        const updatedUser = { ...user, emailVerified: true };
+        setUser(updatedUser);
+        localStorage.setItem('lifelink_user', JSON.stringify(updatedUser));
+      }
+    } catch (err: any) {
+      setVerifyNotice({ type: 'error', msg: err.message || 'Không thể xác minh email' });
+    }
+  };
+
+  const handleLogout = () => {
+    logoutUser();
+    setUser(null);
+    setActiveSessionId(null);
   };
 
   // User Geolocation State (Defaulting to Bình Thạnh, HCMC)
@@ -77,10 +140,8 @@ export function App() {
   const [allHospitals, setAllHospitals] = useState<Hospital[]>([]);
 
   useEffect(() => {
-    // Fetch initial real geolocation on load
     handleFetchRealLocation();
 
-    // Fetch initial emergency hospitals list in Bình Thạnh
     fetchEmergencyHospitals(userLocation).then((hosps) => {
       setEmergencyHospitals(hosps);
       setAllHospitals(hosps);
@@ -99,7 +160,7 @@ export function App() {
   };
 
   return (
-    <div className="h-screen w-screen flex overflow-hidden font-sans selection:bg-emerald-500 selection:text-white">
+    <div className="h-screen w-screen flex overflow-hidden font-sans bg-emerald-50/40 text-slate-900 selection:bg-emerald-500 selection:text-white">
       {/* 1. Left Collapsible Sidebar */}
       <Sidebar
         isOpen={isSidebarOpen}
@@ -116,20 +177,66 @@ export function App() {
           setActiveSessionId(id);
           setActiveTab('chat');
         }}
+        user={user}
+        onOpenAuth={() => setIsAuthModalOpen(true)}
+        onLogout={handleLogout}
       />
 
       {/* 2. Main Right Column */}
-      <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
+      <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden bg-emerald-50/30">
         {/* Top Aligned Navbar */}
         <Navbar
           onTriggerEmergency={() => handleTriggerEmergency()}
           userLocationName={userLocationName}
           onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
           onOpenSettings={() => setIsSettingsOpen(true)}
-          theme={theme}
-          onToggleTheme={toggleTheme}
           isSidebarOpen={isSidebarOpen}
+          user={user}
+          onOpenAuth={() => setIsAuthModalOpen(true)}
+          onLogout={handleLogout}
         />
+
+        {/* Phase 2: Email Verification Notice Toast */}
+        {verifyNotice && (
+          <div className={`px-4 py-2.5 flex items-center justify-between text-xs font-bold shrink-0 ${
+            verifyNotice.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'
+          }`}>
+            <div className="flex items-center gap-2">
+              {verifyNotice.type === 'success' ? <CheckCircle2 className="w-4 h-4 text-white" /> : <AlertCircle className="w-4 h-4 text-white" />}
+              <span>{verifyNotice.msg}</span>
+            </div>
+            <button onClick={() => setVerifyNotice(null)} className="text-white hover:opacity-80 cursor-pointer">
+              ✕
+            </button>
+          </div>
+        )}
+
+        {/* Phase 2: Unverified Email Prompt Banner for Logged-In User */}
+        {user && user.emailVerified === false && (
+          <div className="bg-amber-100 border-b border-amber-300 px-4 py-2 flex flex-col sm:flex-row items-center justify-between text-amber-950 text-xs font-extrabold shrink-0 gap-2">
+            <div className="flex items-center gap-2">
+              <Mail className="w-4 h-4 text-amber-700 shrink-0" />
+              <span>Email của bạn ({user.email}) chưa được xác minh.</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleInstantVerify}
+                className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-extrabold flex items-center gap-1 shadow-xs transition-all cursor-pointer shrink-0"
+              >
+                <CheckCircle2 className="w-3.5 h-3.5 text-white" />
+                <span>Xác minh tức thì (1-Click Dev Test)</span>
+              </button>
+              <button
+                onClick={handleResendEmail}
+                disabled={isResending}
+                className="px-2.5 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-extrabold flex items-center gap-1 shadow-xs transition-all cursor-pointer shrink-0 disabled:opacity-50"
+              >
+                <RefreshCw className={`w-3 h-3 text-white ${isResending ? 'animate-spin' : ''}`} />
+                <span>{isResending ? 'Đang gửi...' : 'Gửi lại Email'}</span>
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Main Content Area - Full Viewport Height for Chat */}
         <main className={`flex-1 w-full ${activeTab === 'chat' ? 'h-full flex flex-col p-2 sm:p-3 overflow-hidden pb-16 md:pb-3' : 'overflow-y-auto p-2 sm:p-4 pb-20 md:pb-4'}`}>
@@ -177,8 +284,16 @@ export function App() {
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
-        theme={theme}
-        onToggleTheme={toggleTheme}
+      />
+
+      {/* Auth Modal (Login / Register) */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onSuccess={(loggedUser) => {
+          setUser(loggedUser);
+          setActiveSessionId(null);
+        }}
       />
 
       {/* Emergency Full-screen Modal */}

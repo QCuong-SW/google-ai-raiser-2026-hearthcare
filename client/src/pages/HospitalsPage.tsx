@@ -37,25 +37,25 @@ export const HospitalsPage: React.FC<HospitalsPageProps> = ({
   return (
     <div className="max-w-6xl mx-auto p-4 pb-20 md:pb-8">
       {/* Search & Filter Header */}
-      <div className="glass-panel rounded-2xl p-4 mb-6 border border-emerald-300 dark:border-slate-800 space-y-4 bg-white dark:bg-slate-900/90 shadow-md">
+      <div className="glass-panel rounded-2xl p-4 mb-6 border border-emerald-300 space-y-4 bg-white shadow-md">
         <div className="flex flex-col sm:flex-row items-center gap-3">
           <div className="relative flex-1 w-full">
-            <Search className="w-4 h-4 text-emerald-600 dark:text-slate-400 absolute left-3.5 top-3.5" />
+            <Search className="w-4 h-4 text-emerald-600 absolute left-3.5 top-3.5" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Tìm kiếm bệnh viện, phòng khám, địa chỉ..."
-              className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-950 border border-emerald-300 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 font-bold shadow-xs"
+              className="w-full pl-10 pr-4 py-2.5 bg-white border border-emerald-300 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-500 font-bold shadow-xs"
             />
           </div>
 
-          {/* 24/7 Button: Mint Background with Emerald Border in Light Mode */}
+          {/* 24/7 Button */}
           <button
             onClick={() => setOnly247(!only247)}
             className={`px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-all border shrink-0 w-full sm:w-auto shadow-xs ${
               only247
-                ? 'bg-rose-100 text-rose-900 dark:bg-red-500/20 dark:text-red-400 border-rose-300 dark:border-red-500/50 font-bold'
+                ? 'bg-rose-100 text-rose-900 border-rose-300 font-bold'
                 : 'bg-emerald-100 text-emerald-950 border-emerald-300 hover:bg-emerald-200 font-bold'
             }`}
           >
@@ -63,10 +63,10 @@ export const HospitalsPage: React.FC<HospitalsPageProps> = ({
           </button>
         </div>
 
-        {/* Specialty Pills: Mint Background with Emerald Border & Dark Emerald Text */}
+        {/* Specialty Pills */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
-          <span className="text-xs text-slate-700 dark:text-slate-400 font-bold flex items-center gap-1 shrink-0">
-            <Filter className="w-3.5 h-3.5 text-emerald-600 dark:text-sky-400" /> Chuyên khoa:
+          <span className="text-xs text-slate-700 font-bold flex items-center gap-1 shrink-0">
+            <Filter className="w-3.5 h-3.5 text-emerald-600" /> Chuyên khoa:
           </span>
           {specialtiesList.map((spec) => (
             <button
@@ -98,7 +98,7 @@ export const HospitalsPage: React.FC<HospitalsPageProps> = ({
         ))}
 
         {filteredHospitals.length === 0 && (
-          <div className="col-span-full py-12 text-center text-slate-500 dark:text-slate-400 glass-panel rounded-2xl bg-white dark:bg-slate-900 border border-emerald-200">
+          <div className="col-span-full py-12 text-center text-slate-500 glass-panel rounded-2xl bg-white border border-emerald-200">
             <Clock className="w-10 h-10 mx-auto text-emerald-600 mb-2" />
             <p className="text-sm font-bold text-slate-800">Không tìm thấy bệnh viện phù hợp với bộ lọc hiện tại.</p>
           </div>

@@ -69,17 +69,17 @@ export const MapView: React.FC<MapViewProps> = ({
         }
         return prev + 10;
       });
-    }, 40); // 40ms x 10 steps = 400ms progress
+    }, 40);
 
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 500); // 0.5s total loading time
+    }, 500);
 
     return () => {
       clearInterval(interval);
       clearTimeout(timer);
     };
-  }, []); // ONLY RUN ONCE ON MOUNT
+  }, []);
 
   const mapCenter: [number, number] = selectedHospital
     ? [selectedHospital.latitude, selectedHospital.longitude]
@@ -102,7 +102,7 @@ export const MapView: React.FC<MapViewProps> = ({
   };
 
   return (
-    <div className="w-full h-full min-h-[420px] rounded-3xl overflow-hidden border border-emerald-300 dark:border-slate-800 relative shadow-2xl bg-white dark:bg-slate-950">
+    <div className="w-full h-full min-h-[420px] rounded-3xl overflow-hidden border border-emerald-300 relative shadow-2xl bg-white">
       {/* Top Map Layer Switcher & High Accuracy GPS Recenter Buttons */}
       <div className="absolute top-3 right-3 z-30 flex items-center gap-1.5 flex-wrap justify-end">
         {/* GPS High Accuracy Recenter Button */}
@@ -118,16 +118,16 @@ export const MapView: React.FC<MapViewProps> = ({
         )}
 
         {/* Map Layer Switcher Control */}
-        <div className="flex items-center gap-1 bg-white/95 dark:bg-slate-900/90 backdrop-blur-xl border border-emerald-300 dark:border-slate-700/80 p-1.5 rounded-2xl shadow-xl">
-          <span className="text-[10px] font-bold text-emerald-800 dark:text-slate-400 px-2 flex items-center gap-1">
-            <Layers className="w-3 h-3 text-emerald-600 dark:text-sky-400" /> Mode:
+        <div className="flex items-center gap-1 bg-white/95 backdrop-blur-xl border border-emerald-300 p-1.5 rounded-2xl shadow-xl">
+          <span className="text-[10px] font-bold text-emerald-800 px-2 flex items-center gap-1">
+            <Layers className="w-3 h-3 text-emerald-600" /> Mode:
           </span>
           <button
             onClick={() => setMapLayerStyle('google')}
             className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${
               mapLayerStyle === 'google'
                 ? 'bg-emerald-600 text-white shadow-md'
-                : 'text-slate-800 dark:text-slate-400 hover:text-emerald-700 dark:hover:text-white'
+                : 'text-slate-800 hover:text-emerald-700'
             }`}
           >
             Google Vector
@@ -137,7 +137,7 @@ export const MapView: React.FC<MapViewProps> = ({
             className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${
               mapLayerStyle === 'satellite'
                 ? 'bg-emerald-600 text-white shadow-md'
-                : 'text-slate-800 dark:text-slate-400 hover:text-emerald-700 dark:hover:text-white'
+                : 'text-slate-800 hover:text-emerald-700'
             }`}
           >
             Vệ Tinh
@@ -147,7 +147,7 @@ export const MapView: React.FC<MapViewProps> = ({
             className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${
               mapLayerStyle === 'dark'
                 ? 'bg-emerald-600 text-white shadow-md'
-                : 'text-slate-800 dark:text-slate-400 hover:text-emerald-700 dark:hover:text-white'
+                : 'text-slate-800 hover:text-emerald-700'
             }`}
           >
             HD Dark
@@ -157,32 +157,32 @@ export const MapView: React.FC<MapViewProps> = ({
 
       {/* 1. Fast 0.5s Loading Radar Overlay */}
       {isLoading && (
-        <div className="map-loading-overlay absolute inset-0 z-40 backdrop-blur-xl flex flex-col items-center justify-center p-6 animate-in fade-in duration-200 bg-white/95 dark:bg-slate-950/95">
+        <div className="map-loading-overlay absolute inset-0 z-40 backdrop-blur-xl flex flex-col items-center justify-center p-6 animate-in fade-in duration-200 bg-white/95">
           <div className="relative mb-6">
             <div className="radar-ring w-20 h-20 rounded-full flex items-center justify-center relative">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-30 bg-emerald-500"></span>
-              <Radar className="w-10 h-10 text-emerald-600 dark:text-sky-400 animate-spin" />
+              <Radar className="w-10 h-10 text-emerald-600 animate-spin" />
             </div>
             <div className="absolute -bottom-2 -right-2 p-1.5 rounded-full bg-emerald-600 text-white shadow-lg">
               <Compass className="w-4 h-4 animate-bounce text-white" />
             </div>
           </div>
 
-          <h3 className="text-base font-bold mb-1 tracking-wide flex items-center gap-2 text-slate-900 dark:text-white">
-            <MapIcon className="w-4 h-4 text-emerald-600 dark:text-sky-400" /> Khởi tạo Bản đồ Google Maps Vector & GPS
+          <h3 className="text-base font-bold mb-1 tracking-wide flex items-center gap-2 text-slate-900">
+            <MapIcon className="w-4 h-4 text-emerald-600" /> Khởi tạo Bản đồ Google Maps Vector & GPS
           </h3>
-          <p className="text-xs text-slate-600 dark:text-slate-400 mb-5 text-center max-w-sm font-medium">
+          <p className="text-xs text-slate-600 mb-5 text-center max-w-sm font-medium">
             Kết nối dữ liệu Google Maps Places API và quét vị trí thực thiết bị...
           </p>
 
           {/* Fast 0.5s Progress Bar */}
-          <div className="w-64 bg-emerald-100 dark:bg-slate-800/40 rounded-full h-2 overflow-hidden border border-emerald-300 dark:border-slate-700/50 shadow-inner">
+          <div className="w-64 bg-emerald-100 rounded-full h-2 overflow-hidden border border-emerald-300 shadow-inner">
             <div
               className="progress-bar-fill h-full rounded-full transition-all duration-75 ease-out bg-emerald-600"
               style={{ width: `${progress}%` }}
             ></div>
           </div>
-          <span className="text-[11px] font-mono text-emerald-700 dark:text-sky-400 font-bold mt-2">{progress}%</span>
+          <span className="text-[11px] font-mono text-emerald-700 font-bold mt-2">{progress}%</span>
         </div>
       )}
 
@@ -206,9 +206,9 @@ export const MapView: React.FC<MapViewProps> = ({
           {/* User Location Marker */}
           <Marker position={[userLocation.lat, userLocation.lng]} icon={userIcon}>
             <Popup>
-              <div className="p-1 text-xs font-bold text-slate-900 dark:text-slate-100">
-                <div className="text-emerald-600 dark:text-sky-400 font-extrabold mb-0.5">🎯 Vị trí thực của bạn (GPS)</div>
-                <div className="text-[10px] text-slate-600 dark:text-slate-400 font-mono">Tọa độ: {userLocation.lat.toFixed(4)}, {userLocation.lng.toFixed(4)}</div>
+              <div className="p-1 text-xs font-bold text-slate-900">
+                <div className="text-emerald-600 font-extrabold mb-0.5">🎯 Vị trí thực của bạn (GPS)</div>
+                <div className="text-[10px] text-slate-600 font-mono">Tọa độ: {userLocation.lat.toFixed(4)}, {userLocation.lng.toFixed(4)}</div>
               </div>
             </Popup>
           </Marker>
@@ -226,12 +226,12 @@ export const MapView: React.FC<MapViewProps> = ({
                 }}
               >
                 <Popup>
-                  <div className="p-1.5 max-w-xs text-slate-900 dark:text-slate-100 font-bold">
-                    <div className="font-extrabold text-sm text-emerald-700 dark:text-sky-300 mb-1">{hosp.name}</div>
-                    <p className="text-[11px] text-slate-600 dark:text-slate-300 mb-2 font-medium">{hosp.address}</p>
+                  <div className="p-1.5 max-w-xs text-slate-900 font-bold">
+                    <div className="font-extrabold text-sm text-emerald-700 mb-1">{hosp.name}</div>
+                    <p className="text-[11px] text-slate-600 mb-2 font-medium">{hosp.address}</p>
 
                     <div className="flex items-center gap-2 text-[11px] mb-2.5">
-                      <span className="font-bold text-emerald-600 dark:text-emerald-400">~{hosp.distanceKm ?? 2} km</span>
+                      <span className="font-bold text-emerald-600">~{hosp.distanceKm ?? 2} km</span>
                       {hosp.isEmergency247 && (
                         <span className="text-red-600 font-bold flex items-center gap-0.5 ml-auto">
                           <ShieldAlert className="w-3 h-3" /> Cấp cứu 24/7

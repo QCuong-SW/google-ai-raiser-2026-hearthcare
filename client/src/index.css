@@ -10,7 +10,7 @@
   }
 }
 
-/* CONTINUOUS ANIMATED GRADIENT SHIMMER TEXT EFFECT */
+/* CONTINUOUS ANIMATED GRADIENT SHIMMER TEXT EFFECT (EMERALD GREEN) */
 @keyframes gradient-shimmer {
   0% {
     background-position: 0% 50%;
@@ -23,449 +23,33 @@
   }
 }
 
-/* Light mode title: Emerald Green + White */
-body.light .animated-gradient-title {
-  background: linear-gradient(90deg, #059669 0%, #ffffff 40%, #047857 70%, #10b981 100%);
+.animated-gradient-title {
+  background: linear-gradient(90deg, #059669 0%, #10b981 40%, #047857 70%, #059669 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   animation: gradient-shimmer 3s ease infinite;
 }
 
-/* Dark mode title: Sky Blue / Cyan + White */
-body.dark .animated-gradient-title,
-body:not(.light) .animated-gradient-title {
-  background: linear-gradient(90deg, #38bdf8 0%, #ffffff 40%, #0284c7 70%, #7dd3fc 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: gradient-shimmer 3s ease infinite;
-}
-
-/* ----------------------------------------------------
-   DARK MODE (100% Cool Cyan / Sky Blue Vibe - NO GREEN)
-   ---------------------------------------------------- */
-body, body.dark {
-  background-color: #090d16;
-  color: #f8fafc;
-}
-
-/* FORCE ALL GREEN BUTTONS & ACCENTS TO SKY BLUE IN DARK MODE */
-body.dark div.bg-emerald-600,
-body.dark button.bg-emerald-600,
-body.dark a.bg-emerald-600,
-body.dark div.bg-emerald-700,
-body.dark button.bg-emerald-700 {
-  background-color: #0284c7 !important;
-  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
-  color: #ffffff !important;
-  border-color: #38bdf8 !important;
-}
-
-body.dark div.border-emerald-500,
-body.dark button.border-emerald-500,
-body.dark div.border-emerald-400 {
-  border-color: rgba(56, 189, 248, 0.4) !important;
-}
-
-body.dark svg.text-emerald-600,
-body.dark svg.text-emerald-700,
-body.dark svg.text-emerald-500,
-body.dark .text-emerald-600,
-body.dark .text-emerald-700 {
-  color: #38bdf8 !important;
-}
-
-body.dark .glass-panel {
-  background: rgba(15, 23, 42, 0.88);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-body.dark .theme-accent-bg {
-  background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%) !important;
-  color: #ffffff !important;
-  border-color: #38bdf8 !important;
-}
-
-body.dark .theme-accent-text {
-  color: #38bdf8 !important;
-}
-
-body.dark .brand-title-text {
-  color: #38bdf8 !important;
-}
-
-body.dark .theme-accent-hover:hover {
-  background-color: rgba(56, 189, 248, 0.15) !important;
-  color: #38bdf8 !important;
-}
-
-body.dark header {
-  background: rgba(15, 23, 42, 0.95) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
-
-body.dark .map-loading-overlay {
-  background-color: rgba(9, 13, 22, 0.92) !important;
-  color: #ffffff !important;
-}
-
-body.dark .radar-ring {
-  background-color: rgba(56, 189, 248, 0.1) !important;
-  border: 2px solid rgba(56, 189, 248, 0.4) !important;
-}
-
-body.dark .progress-bar-fill {
-  background: linear-gradient(90deg, #0284c7 0%, #38bdf8 100%) !important;
-}
-
-body.dark .emergency-contact-box {
-  background-color: rgba(69, 10, 10, 0.4) !important;
-  border-color: rgba(239, 68, 68, 0.3) !important;
-}
-
-body.dark .emergency-contact-title {
-  color: #f87171 !important;
-}
-
-/* ----------------------------------------------------
-   LIGHT MODE (100% High Contrast Bright White & Emerald Green Theme)
-   ---------------------------------------------------- */
-body.light {
-  background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 40%, #ffffff 100%) !important;
-  background-attachment: fixed !important;
-  color: #0f172a !important;
-}
-
-/* Brand Title Color in Light Mode - Guaranteed Emerald Green */
-body.light .brand-title-text {
-  color: #059669 !important;
-}
-
-/* BOT & USER AVATARS IN LIGHT MODE - GUARANTEED EMERALD GREEN */
-body.light div.rounded-xl.bg-emerald-600,
-body.light div.rounded-full.bg-emerald-600 {
-  background-color: #059669 !important;
-  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
-  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3) !important;
-}
-
-body.light div.rounded-xl.bg-emerald-600 svg,
-body.light div.rounded-full.bg-emerald-600 svg {
-  color: #ffffff !important;
-}
-
-/* Brand Logo Icon Container in Light Mode */
-body.light aside div.bg-emerald-600,
-body.light header div.bg-emerald-600 {
-  background-color: #059669 !important;
-  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
-  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3) !important;
-}
-
-/* Glass Panel in Light Mode */
-body.light .glass-panel {
-  background: #ffffff !important;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid #a7f3d0 !important;
-  box-shadow: 0 10px 30px -5px rgba(5, 150, 105, 0.1) !important;
-}
-
-/* HOSPITALS PAGE FILTER BUTTONS IN LIGHT MODE */
-body.light div[class*="glass-panel"] button {
-  background-color: #d1fae5 !important;
-  color: #064e3b !important;
-  border-color: #6ee7b7 !important;
-  font-weight: 800 !important;
-}
-
-body.light div[class*="glass-panel"] button.bg-emerald-600,
-body.light div[class*="glass-panel"] button[class*="bg-emerald-600"] {
-  background-color: #059669 !important;
-  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
-  color: #ffffff !important;
-}
-
-body.light div[class*="glass-panel"] button.bg-emerald-600 *,
-body.light div[class*="glass-panel"] button[class*="bg-emerald-600"] * {
-  color: #ffffff !important;
-}
-
-/* HOSPITAL CARD PHONE & MAP PIN BUTTONS IN LIGHT MODE */
-body.light a[href^="tel:"],
-body.light button[title*="Xem trên bản đồ"],
-body.light .hospital-specialty-pill {
-  background-color: #d1fae5 !important;
-  color: #064e3b !important;
-  border: 1px solid #6ee7b7 !important;
-  font-weight: 800 !important;
-}
-
-body.light a[href^="tel:"] svg,
-body.light button[title*="Xem trên bản đồ"] svg {
-  color: #047857 !important;
-}
-
-body.light a[href*="google.com/maps"] {
-  background-color: #059669 !important;
-  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
-  color: #ffffff !important;
-  font-weight: 800 !important;
-}
-
-body.light a[href*="google.com/maps"] * {
-  color: #ffffff !important;
-}
-
-/* ALL ICONS IN LIGHT MODE ARE EMERALD GREEN BY DEFAULT */
-body.light svg {
+/* BRAND TITLE COLOR */
+.brand-title-text {
   color: #059669;
 }
 
-body.light button.bg-emerald-600 svg,
-body.light button.bg-emerald-700 svg,
-body.light div.bg-emerald-600 svg,
-body.light div.bg-emerald-700 svg,
-body.light .text-white svg {
-  color: #ffffff !important;
+/* GLASS PANEL UTILITY */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
-/* Sidebar Close (X) Button in Light Mode */
-body.light button[title*="Ẩn Sidebar Nav"] {
-  background-color: #d1fae5 !important;
-  border-color: #6ee7b7 !important;
-  color: #064e3b !important;
+.dark .glass-panel {
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
-body.light button[title*="Ẩn Sidebar Nav"] svg {
-  color: #047857 !important;
-}
-
-/* Image Upload [📷] button in Light Mode */
-body.light button[title*="Đính kèm ảnh"],
-body.light .image-upload-btn {
-  background-color: #d1fae5 !important;
-  border-color: #6ee7b7 !important;
-  color: #064e3b !important;
-}
-
-body.light button[title*="Đính kèm ảnh"] svg,
-body.light .image-upload-btn svg {
-  color: #047857 !important;
-}
-
-/* SIDEBAR MENU BADGES IN LIGHT MODE */
-body.light .sidebar-badge-pill {
-  background-color: #d1fae5 !important;
-  color: #064e3b !important;
-  border-color: #6ee7b7 !important;
-  font-weight: 800 !important;
-}
-
-/* ENSURE NO UGLY BOXES AROUND SIDEBAR CHAT THREAD TEXT SPANS IN LIGHT MODE */
-body.light aside span {
-  background-color: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-/* Sidebar Toggle Button Override in Light Mode - Solid Emerald Green with White Icon */
-body.light .sidebar-toggle-btn {
-  background-color: #059669 !important;
-  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
-  color: #ffffff !important;
-  border: 1px solid #10b981 !important;
-  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.35) !important;
-}
-
-body.light .sidebar-toggle-btn * {
-  color: #ffffff !important;
-}
-
-/* Ensure all Headings, Subtitles and Paragraphs are High-Contrast Dark Slate/Emerald in Light Mode */
-body.light h1,
-body.light h2,
-body.light h3,
-body.light h4,
-body.light h5,
-body.light h6 {
-  color: #064e3b !important;
-}
-
-body.light p,
-body.light span,
-body.light div {
-  color: #0f172a;
-}
-
-body.light .text-slate-400,
-body.light .text-slate-500,
-body.light .text-slate-600 {
-  color: #334155 !important;
-}
-
-/* FIX LIGHT MODE CHAT BUBBLE TEXT COLOR */
-body.light .rounded-2xl p {
-  color: #0f172a !important;
-  font-weight: 600 !important;
-}
-
-/* Force light backgrounds for any slate containers in Light Mode */
-body.light div[class*="bg-slate-950"],
-body.light div[class*="bg-slate-900"],
-body.light div[class*="bg-slate-800"] {
-  background-color: #ffffff !important;
-  color: #0f172a !important;
-  border-color: #a7f3d0 !important;
-}
-
-/* AI Message Bubble in Light Mode - White card with emerald border */
-body.light div[class*="bg-emerald-50"] {
-  background-color: #f0fdf4 !important;
-  border: 1px solid #a7f3d0 !important;
-}
-
-/* User message bubbles in Light Mode remain solid Emerald Green with white text */
-body.light div[class*="bg-emerald-600"].rounded-2xl {
-  background-color: #059669 !important;
-  color: #ffffff !important;
-}
-
-body.light div[class*="bg-emerald-600"].rounded-2xl *,
-body.light div[class*="bg-emerald-600"].rounded-2xl p {
-  color: #ffffff !important;
-}
-
-/* Chat Input Bar in Light Mode */
-body.light input[type="text"] {
-  background-color: #ffffff !important;
-  color: #0f172a !important;
-  border-color: #6ee7b7 !important;
-  font-weight: 600 !important;
-}
-
-body.light input[type="text"]::placeholder {
-  color: #64748b !important;
-}
-
-/* Model Picker Dropdown Button & Popup in Light Mode */
-body.light button[title*="Model Picker"],
-body.light button[title*="Chế độ AI"] {
-  background-color: #ffffff !important;
-  color: #064e3b !important;
-  border-color: #6ee7b7 !important;
-}
-
-/* High-Contrast Emergency Contact Box in Light Mode */
-body.light .emergency-contact-box {
-  background-color: #fff1f2 !important;
-  border-color: #fecdd3 !important;
-  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.06) !important;
-}
-
-body.light .emergency-contact-title {
-  color: #9f1239 !important;
-}
-
-body.light .emergency-contact-box input[type="text"] {
-  background-color: #ffffff !important;
-  color: #0f172a !important;
-  border-color: #fda4af !important;
-}
-
-/* Sidebar Bottom Container in Light Mode (Soft Mint Background) */
-body.light .sidebar-bottom-container {
-  background-color: #ecfdf5 !important;
-  border-top: 1px solid rgba(16, 185, 129, 0.25) !important;
-}
-
-body.light .sidebar-bottom-container > div {
-  background-color: #ffffff !important;
-  border: 1px solid rgba(16, 185, 129, 0.3) !important;
-}
-
-body.light .map-loading-overlay {
-  background-color: rgba(240, 253, 244, 0.96) !important;
-  color: #064e3b !important;
-}
-
-body.light .map-loading-overlay h3 {
-  color: #064e3b !important;
-}
-
-body.light .radar-ring {
-  background-color: rgba(16, 185, 129, 0.15) !important;
-  border: 2px solid rgba(16, 185, 129, 0.5) !important;
-}
-
-body.light .progress-bar-fill {
-  background: linear-gradient(90deg, #059669 0%, #10b981 100%) !important;
-}
-
-body.light .theme-accent-bg {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
-  color: #ffffff !important;
-  border-color: #10b981 !important;
-}
-
-body.light .theme-accent-text {
-  color: #059669 !important;
-}
-
-body.light .theme-accent-hover:hover {
-  background-color: #d1fae5 !important;
-  color: #047857 !important;
-}
-
-/* Soothing Deep Emerald Top Navbar in Light Mode */
-body.light header {
-  background: linear-gradient(135deg, #064e3b 0%, #047857 100%) !important;
-  color: #ffffff !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
-  box-shadow: 0 4px 20px rgba(6, 78, 59, 0.15) !important;
-}
-
-body.light header * {
-  color: #ffffff !important;
-}
-
-body.light header .text-slate-400 {
-  color: #a7f3d0 !important;
-}
-
-body.light header button:hover {
-  background-color: rgba(255, 255, 255, 0.2) !important;
-}
-
-/* Sidebar in Light Mode */
-body.light aside {
-  background: #ffffff !important;
-  border-right: 1px solid rgba(16, 185, 129, 0.25) !important;
-}
-
-/* Input Box in Light Mode with Emerald Focus Ring */
-body.light input[type="text"],
-body.light select {
-  background-color: #ffffff !important;
-  color: #0f172a !important;
-  border-color: rgba(16, 185, 129, 0.35) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
-}
-
-body.light input[type="text"]:focus,
-body.light select:focus {
-  border-color: #059669 !important;
-  outline: 2px solid rgba(5, 150, 105, 0.3) !important;
-}
-
-body.light input[type="text"]::placeholder {
-  color: #94a3b8 !important;
-}
-
-/* Emergency Red Modal remains vibrant red */
+/* EMERGENCY RED BEACON (STRICTLY FOR 115 EMERGENCY BUTTON) */
 .glass-emergency {
   background: rgba(153, 27, 27, 0.95);
   backdrop-filter: blur(20px);
@@ -474,10 +58,9 @@ body.light input[type="text"]::placeholder {
 }
 
 .glass-emergency * {
-  color: #ffffff !important;
+  color: #ffffff;
 }
 
-/* Emergency Beacon Pulse Animation */
 @keyframes beacon-pulse {
   0% {
     box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.8);
@@ -497,7 +80,7 @@ body.light input[type="text"]::placeholder {
   animation: beacon-pulse 1.8s infinite ease-in-out;
 }
 
-/* Custom Scrollbar */
+/* CUSTOM SCROLLBAR (EMERALD GREEN) */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -513,20 +96,12 @@ body.light input[type="text"]::placeholder {
   background: rgba(16, 185, 129, 0.7);
 }
 
-/* Leaflet Map Theme overrides */
+/* LEAFLET MAP */
 .leaflet-container {
   width: 100%;
   height: 100%;
   border-radius: 12px;
   z-index: 1;
-}
-
-body.dark .leaflet-tile {
-  filter: brightness(0.7) invert(1) contrast(1.2) hue-rotate(200deg) saturate(0.3);
-}
-
-body.light .leaflet-tile {
-  filter: none !important;
 }
 
 .leaflet-popup-content-wrapper {

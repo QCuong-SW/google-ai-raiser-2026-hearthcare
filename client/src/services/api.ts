@@ -1,4 +1,4 @@
-import type { Hospital, TriageAnalysis, MedicalProfile } from '../types';
+import type { Hospital, TriageAnalysis, MedicalProfile, AuthUser } from '../types';
 
 const API_BASE_URL = 'http://localhost:3001/api';
 
@@ -155,11 +155,239 @@ const MOCK_BINHTHANH_HOSPITALS: Hospital[] = [
   }
 ];
 
+export async function loginUser(email: string, password: string): Promise<{ accessToken: string; refreshToken: string; user: AuthUser }> {
+  const res = await fetch(`${API_BASE_URL}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    const errorMsg = Array.isArray(data.message) ? data.message.join(', ') : (data.message || 'Đăng nhập thất bại');
+    throw new Error(errorMsg);
+  }
+  localStorage.setItem('lifelink_token', data.accessToken);
+  if (data.refreshToken) localStorage.setItem('lifelink_refresh_token', data.refreshToken);
+  localStorage.setItem('lifelink_user', JSON.stringify(data.user));
+  return data;
+}
+
+export async function registerUser(email: string, password: string, fullName: string, phone?: string): Promise<{ accessToken: string; refreshToken: string; user: AuthUser }> {
+  const res = await fetch(`${API_BASE_URL}/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password, fullName, phone }),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    const errorMsg = Array.isArray(data.message) ? data.message.join(', ') : (data.message || 'Đăng ký thất bại');
+    throw new Error(errorMsg);
+  }
+  localStorage.setItem('lifelink_token', data.accessToken);
+  if (data.refreshToken) localStorage.setItem('lifelink_refresh_token', data.refreshToken);
+  localStorage.setItem('lifelink_user', JSON.stringify(data.user));
+  return data;
+}
+
+export async function fetchGoogleConfigApi(): Promise<{ clientId: string }> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/auth/google-config`);
+    if (!res.ok) return { clientId: '' };
+    return await res.json();
+  } catch (err) {
+    return { clientId: '' };
+  }
+}
+
+export async function googleLoginApi(idToken: string): Promise<{ accessToken: string; refreshToken: string; user: AuthUser }> {
+  const res = await fetch(`${API_BASE_URL}/auth/google`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ idToken }),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    const errorMsg = Array.isArray(data.message) ? data.message.join(', ') : (data.message || 'Đăng nhập Google thất bại');
+    throw new Error(errorMsg);
+  }
+  localStorage.setItem('lifelink_token', data.accessToken);
+  if (data.refreshToken) localStorage.setItem('lifelink_refresh_token', data.refreshToken);
+  localStorage.setItem('lifelink_user', JSON.stringify(data.user));
+  return data;
+}
+
+export async function refreshAccessTokenApi(): Promise<string | null> {
+  const refreshToken = localStorage.getItem('lifelink_refresh_token');
+  if (!refreshToken) return null;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/auth/refresh`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken }),
+    });
+    if (!res.ok) {
+      logoutUser();
+      return null;
+    }
+    const data = await res.json();
+    localStorage.setItem('lifelink_token', data.accessToken);
+    if (data.refreshToken) localStorage.setItem('lifelink_refresh_token', data.refreshToken);
+    return data.accessToken;
+  } catch (err) {
+    logoutUser();
+    return null;
+  }
+}
+
+export async function fetchCurrentUser(): Promise<AuthUser | null> {
+  let token = localStorage.getItem('lifelink_token');
+  if (!token) return null;
+  try {
+    let res = await fetch(`${API_BASE_URL}/auth/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    // Auto-refresh token on 401 Unauthorized
+    if (res.status === 401) {
+      const newToken = await refreshAccessTokenApi();
+      if (newToken) {
+        res = await fetch(`${API_BASE_URL}/auth/me`, {
+          headers: { Authorization: `Bearer ${newToken}` },
+        });
+      }
+    }
+
+    if (!res.ok) {
+      logoutUser();
+      return null;
+    }
+    const user = await res.json();
+    localStorage.setItem('lifelink_user', JSON.stringify(user));
+    return user;
+  } catch (err) {
+    console.warn('Could not verify token with backend');
+    return null;
+  }
+}
+
+export function logoutUser(): void {
+  const refreshToken = localStorage.getItem('lifelink_refresh_token');
+  if (refreshToken) {
+    fetch(`${API_BASE_URL}/auth/logout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken }),
+    }).catch(() => {});
+  }
+  localStorage.removeItem('lifelink_token');
+  localStorage.removeItem('lifelink_refresh_token');
+  localStorage.removeItem('lifelink_user');
+}
+
+export async function verifyEmailApi(token: string): Promise<{ success: boolean; message: string }> {
+  const res = await fetch(`${API_BASE_URL}/auth/verify-email`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token }),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || 'Xác minh Email thất bại');
+  }
+  return data;
+}
+
+export async function resendVerificationApi(): Promise<{ success: boolean; message: string; devToken?: string }> {
+  const token = localStorage.getItem('lifelink_token');
+  if (!token) throw new Error('Vui lòng đăng nhập lại');
+  const res = await fetch(`${API_BASE_URL}/auth/resend-verification`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || 'Gửi lại email thất bại');
+  }
+  return data;
+}
+
+export async function instantVerifyEmailApi(): Promise<{ success: boolean; message: string }> {
+  const token = localStorage.getItem('lifelink_token');
+  if (!token) throw new Error('Vui lòng đăng nhập lại');
+  const res = await fetch(`${API_BASE_URL}/auth/instant-verify-email`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || 'Xác minh thất bại');
+  }
+  return data;
+}
+
+export async function forgotPasswordApi(email: string): Promise<{ success: boolean; message: string }> {
+  const res = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    const errorMsg = Array.isArray(data.message) ? data.message.join(', ') : (data.message || 'Yêu cầu thất bại');
+    throw new Error(errorMsg);
+  }
+  return data;
+}
+
+export async function verifyResetCodeApi(email: string, code: string): Promise<{ success: boolean; resetToken: string }> {
+  const res = await fetch(`${API_BASE_URL}/auth/verify-reset-code`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, code }),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    const errorMsg = Array.isArray(data.message) ? data.message.join(', ') : (data.message || 'Mã OTP không chính xác');
+    throw new Error(errorMsg);
+  }
+  return data;
+}
+
+export async function resetPasswordApi(resetToken: string, newPassword: string): Promise<{ success: boolean; message: string }> {
+  const res = await fetch(`${API_BASE_URL}/auth/reset-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ resetToken, newPassword }),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    const errorMsg = Array.isArray(data.message) ? data.message.join(', ') : (data.message || 'Đặt lại mật khẩu thất bại');
+    throw new Error(errorMsg);
+  }
+  return data;
+}
+
+function getAuthHeaders(): Record<string, string> {
+  const token = localStorage.getItem('lifelink_token');
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+}
+
 export async function createChatSession(activeMode?: string, title?: string): Promise<{ id: string }> {
   try {
     const res = await fetch(`${API_BASE_URL}/chat/session`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify({ activeMode, title }),
     });
     if (!res.ok) throw new Error('Failed to create chat session');
@@ -172,7 +400,9 @@ export async function createChatSession(activeMode?: string, title?: string): Pr
 
 export async function fetchChatSessions(): Promise<{ id: string; title: string }[]> {
   try {
-    const res = await fetch(`${API_BASE_URL}/chat/sessions`);
+    const res = await fetch(`${API_BASE_URL}/chat/sessions`, {
+      headers: getAuthHeaders(),
+    });
     if (!res.ok) throw new Error('Failed to fetch chat sessions');
     return await res.json();
   } catch (err) {
@@ -185,6 +415,7 @@ export async function deleteChatSession(sessionId: string): Promise<boolean> {
   try {
     const res = await fetch(`${API_BASE_URL}/chat/session/${sessionId}`, {
       method: 'DELETE',
+      headers: getAuthHeaders(),
     });
     return res.ok;
   } catch (err) {
@@ -195,7 +426,9 @@ export async function deleteChatSession(sessionId: string): Promise<boolean> {
 
 export async function fetchChatHistory(sessionId: string): Promise<any[]> {
   try {
-    const res = await fetch(`${API_BASE_URL}/chat/session/${sessionId}/history`);
+    const res = await fetch(`${API_BASE_URL}/chat/session/${sessionId}/history`, {
+      headers: getAuthHeaders(),
+    });
     if (!res.ok) throw new Error('Failed to fetch chat history');
     return await res.json();
   } catch (err) {
@@ -214,7 +447,7 @@ export async function fetchTriage(
   try {
     const res = await fetch(`${API_BASE_URL}/triage/analyze`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),
       body: JSON.stringify({
         symptomQuery,
         userLocation,
@@ -324,6 +557,15 @@ function fallbackClientTriage(query: string): { triage: TriageAnalysis; hospital
     action = 'Nên khám tại Bệnh viện Ung Bướu TP.HCM Cơ sở 1 (Số 03 Nơ Trang Long, Bình Thạnh).';
   }
 
+  const wantsMore =
+    lower.includes('thêm') ||
+    lower.includes('nhiều') ||
+    lower.includes('danh sách') ||
+    lower.includes('khác') ||
+    lower.includes('bệnh viện khác');
+
+  const hospitals = wantsMore ? MOCK_BINHTHANH_HOSPITALS : MOCK_BINHTHANH_HOSPITALS.slice(0, 2);
+
   return {
     triage: {
       severity,
@@ -333,6 +575,6 @@ function fallbackClientTriage(query: string): { triage: TriageAnalysis; hospital
       medical_advice_disclaimer: `🤖 [AI Triage Bình Thạnh]: Đánh giá triệu chứng "${query}". Phân loại mức độ: ${severity}.`,
       suggested_action: action,
     },
-    hospitals: MOCK_BINHTHANH_HOSPITALS,
+    hospitals,
   };
 }

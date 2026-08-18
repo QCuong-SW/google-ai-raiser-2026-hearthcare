@@ -46,3 +46,14 @@ export interface MedicalProfile {
   emergencyContactPhone: string;
   insuranceNumber?: string;
 }
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  fullName: string;
+  role: 'USER' | 'ADMIN';
+  status?: 'ACTIVE' | 'INACTIVE' | 'BANNED';
+  provider?: 'LOCAL' | 'GOOGLE' | 'BOTH';
+  emailVerified?: boolean;
+  avatar?: string | null;
+}

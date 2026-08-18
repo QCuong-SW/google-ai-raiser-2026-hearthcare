@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS medical_profiles (
 CREATE TABLE IF NOT EXISTS chat_sessions (
     id VARCHAR(36) PRIMARY KEY DEFAULT uuid_generate_v4()::text,
     user_id VARCHAR(36) REFERENCES users(id) ON DELETE CASCADE,
-    title VARCHAR(255) DEFAULT 'Đoạn Triage Y Tế',
+    title VARCHAR(255) DEFAULT 'Đoạn chat Y Tế',
     active_mode VARCHAR(50) DEFAULT 'triage_hospital', -- 'triage_hospital' | 'analyze_symptom' | 'first_aid'
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );

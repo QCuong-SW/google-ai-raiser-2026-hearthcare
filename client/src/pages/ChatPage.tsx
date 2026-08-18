@@ -38,7 +38,7 @@ export const ChatPage = ({
   const defaultWelcomeMsg: ChatMessage = {
     id: 'welcome-msg',
     sender: 'ai',
-    text: 'Xin chào! Tôi là LifeLink AI Medical Assistant (Sử dụng Google Gemini Flash Vision). Bạn có thể chọn Chế độ AI (Dropdown góc dưới), nhập câu hỏi, tải ảnh hoặc dán ảnh (Ctrl+V) vào ô chat để tôi phân tích nhé!',
+    text: 'Xin chào! Tôi là LifeLink AI Medical Assistant (Sử dụng Google Gemini Flash Vision). Bạn cần hỗ trợ gì?',
     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
   };
 
@@ -57,7 +57,7 @@ export const ChatPage = ({
       label: 'Phân tích triệu chứng',
       desc: 'Chẩn đoán lâm sàng sâu & chuyên khoa khuyên dùng',
       icon: Stethoscope,
-      color: 'text-teal-600',
+      color: 'text-emerald-700',
     },
     {
       id: 'first_aid' as const,
@@ -76,18 +76,34 @@ export const ChatPage = ({
     async function loadSession() {
       if (activeSessionId) {
         setSessionId(activeSessionId);
-        const history = await fetchChatHistory(activeSessionId);
-        if (history && history.length > 0) {
-          const formattedHistory: ChatMessage[] = history.map((m: any) => ({
-            id: m.id,
-            sender: m.sender,
-            text: m.text,
-            imageUrl: m.imageUrl,
-            triageResult: m.triageResult,
-            recommendedHospitals: m.recommendedHospitals,
-            timestamp: new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          }));
-          setMessages(formattedHistory);
+        try {
+          const history = await fetchChatHistory(activeSessionId);
+          if (history && Array.isArray(history) && history.length > 0) {
+            const formattedHistory: ChatMessage[] = history.map((m: any) => ({
+              id: m.id || `msg-${Math.random()}`,
+              sender: m.sender || 'ai',
+              text: m.text || '',
+              imageUrl: m.imageUrl || undefined,
+              triageResult: m.triageResult || undefined,
+              recommendedHospitals: m.recommendedHospitals || undefined,
+              timestamp: m.createdAt
+                ? new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            }));
+            setMessages(formattedHistory);
+          } else {
+            setMessages([
+              {
+                id: `empty-${activeSessionId}`,
+                sender: 'ai',
+                text: 'Đoạn chat này hiện chưa có dữ liệu tin nhắn cũ. Bạn hãy nhập câu hỏi mới bên dưới để bắt đầu hội thoại nhé!',
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              },
+            ]);
+          }
+        } catch (err) {
+          console.error('Error loading session history:', err);
+          setMessages([defaultWelcomeMsg]);
         }
       } else {
         setSessionId(null);
@@ -105,28 +121,23 @@ export const ChatPage = ({
     scrollToBottom();
   }, [messages, isLoading]);
 
-  // Toggle Dropdown Animation
+  // Dropdown open/close handler
   const toggleDropdown = () => {
-    if (!isDropdownRendered) {
-      setIsDropdownRendered(true);
-      const timer = setTimeout(() => {
-        setIsDropdownAnimating(true);
-      }, 15);
-      return () => clearTimeout(timer);
+    if (isDropdownRendered) {
+      setIsDropdownAnimating(false);
+      setTimeout(() => setIsDropdownRendered(false), 250);
     } else {
-      closeDropdown();
+      setIsDropdownRendered(true);
+      setTimeout(() => setIsDropdownAnimating(true), 10);
     }
   };
 
   const closeDropdown = () => {
     setIsDropdownAnimating(false);
-    const timer = setTimeout(() => {
-      setIsDropdownRendered(false);
-    }, 280);
-    return () => clearTimeout(timer);
+    setTimeout(() => setIsDropdownRendered(false), 250);
   };
 
-  // Click outside to close dropdown smoothly
+  // Close dropdown on click outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -137,6 +148,7 @@ export const ChatPage = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Image Upload Handlers
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -148,38 +160,31 @@ export const ChatPage = ({
     }
   };
 
-  // PASTE IMAGE DIRECTLY FROM CLIPBOARD (Ctrl+V)
-  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
-    const items = e.clipboardData?.items;
-    if (!items) return;
-
+  const handlePaste = (e: React.ClipboardEvent) => {
+    const items = e.clipboardData.items;
     for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-      if (item.type.indexOf('image') !== -1) {
-        const file = item.getAsFile();
+      if (items[i].type.indexOf('image') !== -1) {
+        const file = items[i].getAsFile();
         if (file) {
-          e.preventDefault();
           const reader = new FileReader();
           reader.onloadend = () => {
             setSelectedImage(reader.result as string);
           };
           reader.readAsDataURL(file);
-          break;
         }
       }
     }
   };
 
-  const handleSendMessage = async (textToSend?: string, imageToSend?: string | null) => {
-    const query = textToSend || inputMessage;
-    const attachedImage = imageToSend !== undefined ? imageToSend : selectedImage;
+  const handleSendMessage = async () => {
+    if (!inputMessage.trim() && !selectedImage) return;
 
-    if ((!query.trim() && !attachedImage) || isLoading) return;
+    const query = inputMessage.trim();
+    const attachedImage = selectedImage;
 
-    // Create session ONLY when first user message is actually sent!
     let currentSessionId = sessionId;
     if (!currentSessionId) {
-      const newSession = await createChatSession(activeAiMode, query || 'Phân tích ảnh lâm sàng đính kèm');
+      const newSession = await createChatSession(activeAiMode, query.slice(0, 30) || 'Phân tích hình ảnh');
       currentSessionId = newSession.id;
       setSessionId(newSession.id);
       if (onSessionCreated) onSessionCreated(newSession.id);
@@ -207,7 +212,6 @@ export const ChatPage = ({
         attachedImage,
       );
 
-      // ALWAYS use the direct AI response from Gemini!
       let responseText = triage.medical_advice_disclaimer;
 
       if (attachedImage && !responseText.includes('📸')) {
@@ -225,7 +229,6 @@ export const ChatPage = ({
 
       setMessages((prev) => [...prev, aiMsg]);
 
-      // Trigger Emergency Modal if critical
       if (triage.is_emergency || triage.severity === 'CRITICAL' || triage.severity === 'HIGH') {
         setTimeout(() => {
           onTriggerEmergencyWithReason(triage.emergency_reason || 'Triệu chứng khẩn cấp đe dọa tính mạng');
@@ -239,11 +242,11 @@ export const ChatPage = ({
   };
 
   return (
-    <div className="flex flex-col h-full w-full max-w-5xl mx-auto relative rounded-3xl overflow-hidden glass-panel border border-emerald-300 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950">
+    <div className="flex flex-col h-full w-full max-w-5xl mx-auto relative rounded-3xl overflow-hidden glass-panel border border-emerald-300 shadow-2xl bg-white">
       {/* 1. Top Header Bar */}
-      <div className="px-4 py-3 bg-emerald-100/90 dark:bg-slate-900 border-b border-emerald-300 dark:border-slate-800 flex items-center justify-between shrink-0">
+      <div className="px-4 py-3 bg-emerald-100/90 border-b border-emerald-300 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-emerald-600 dark:bg-sky-600 flex items-center justify-center text-white shadow-md">
+          <div className="w-8 h-8 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-md">
             <Bot className="w-4 h-4 text-white" />
           </div>
           <div>
@@ -254,13 +257,13 @@ export const ChatPage = ({
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
               </span>
             </div>
-            <p className="text-[10px] text-slate-700 dark:text-slate-400 font-bold">Gemini 3.6 Flash Vision AI • Paste Clipboard Image (Ctrl+V) Supported</p>
+            <p className="text-[10px] text-slate-700 font-bold">Gemini 3.6 Flash Vision AI • Paste Clipboard Image (Ctrl+V) Supported</p>
           </div>
         </div>
       </div>
 
       {/* 2. Messages Scroll Area */}
-      <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 bg-white dark:bg-slate-950">
+      <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 bg-white">
         {messages.map((msg) => (
           <div
             key={msg.id}
@@ -271,7 +274,7 @@ export const ChatPage = ({
               className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-md ${
                 msg.sender === 'user'
                   ? 'bg-emerald-600 text-white'
-                  : 'bg-emerald-600 dark:bg-sky-600 text-white'
+                  : 'bg-emerald-600 text-white'
               }`}
             >
               {msg.sender === 'user' ? <UserIcon className="w-4 h-4 text-white" /> : <Bot className="w-4 h-4 text-white" />}
@@ -283,53 +286,53 @@ export const ChatPage = ({
                 className={`rounded-2xl p-4 shadow-md text-sm leading-relaxed ${
                   msg.sender === 'user'
                     ? 'bg-emerald-600 text-white rounded-tr-none font-bold'
-                    : 'bg-emerald-50/90 dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-tl-none border border-emerald-300 dark:border-slate-800 shadow-sm font-medium'
+                    : 'bg-emerald-50/90 text-slate-900 rounded-tl-none border border-emerald-300 shadow-sm font-medium'
                 }`}
               >
                 {msg.sender === 'ai' && (
-                  <div className="flex items-center gap-2 mb-2 pb-1.5 border-b border-emerald-200 dark:border-slate-800 text-xs font-bold text-emerald-800 dark:text-sky-400">
-                    <HeartPulse className="w-4 h-4 text-emerald-600 dark:text-sky-400 animate-pulse" />
+                  <div className="flex items-center gap-2 mb-2 pb-1.5 border-b border-emerald-200 text-xs font-bold text-emerald-800">
+                    <HeartPulse className="w-4 h-4 text-emerald-600 animate-pulse" />
                     <span>Đánh giá Triage AI</span>
-                    <span className="text-[10px] text-slate-500 dark:text-slate-400 ml-auto">{msg.timestamp}</span>
+                    <span className="text-[10px] text-slate-500 ml-auto">{msg.timestamp}</span>
                   </div>
                 )}
 
                 {/* Attached User Image Display */}
                 {msg.imageUrl && (
-                  <div className="mb-3 overflow-hidden rounded-xl border border-emerald-300 dark:border-white/30 max-w-sm shadow-md">
+                  <div className="mb-3 overflow-hidden rounded-xl border border-emerald-300 max-w-sm shadow-md">
                     <img src={msg.imageUrl} alt="Đính kèm lâm sàng" className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300" />
                   </div>
                 )}
 
-                <p className="whitespace-pre-line font-bold text-slate-900 dark:text-slate-100">{msg.text}</p>
+                <p className="whitespace-pre-line font-bold text-slate-900">{msg.text}</p>
 
                 {/* Structured Triage Status Card */}
                 {msg.triageResult && (
-                  <div className="mt-3 pt-3 border-t border-emerald-200 dark:border-slate-800 space-y-2">
+                  <div className="mt-3 pt-3 border-t border-emerald-200 space-y-2">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-xs text-slate-700 dark:text-slate-400 font-bold">Mức độ phân loại:</span>
+                      <span className="text-xs text-slate-700 font-bold">Mức độ phân loại:</span>
                       <span
                         className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider ${
                           msg.triageResult.severity === 'CRITICAL'
                             ? 'bg-red-600 text-white animate-pulse shadow-lg shadow-red-600/40'
                             : msg.triageResult.severity === 'HIGH'
-                            ? 'bg-rose-100 text-rose-900 dark:bg-rose-500/20 dark:text-rose-300 border border-rose-300 dark:border-rose-500/40'
+                            ? 'bg-rose-100 text-rose-900 border border-rose-300'
                             : msg.triageResult.severity === 'MEDIUM'
-                            ? 'bg-amber-100 text-amber-950 dark:bg-amber-500/20 dark:text-amber-300 border border-amber-300 dark:border-amber-500/40'
-                            : 'bg-emerald-100 text-emerald-950 dark:bg-emerald-500/20 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-500/40'
+                            ? 'bg-amber-100 text-amber-950 border border-amber-300'
+                            : 'bg-emerald-100 text-emerald-950 border border-emerald-300'
                         }`}
                       >
                         {msg.triageResult.severity}
                       </span>
                     </div>
 
-                    {msg.triageResult.specialty_needed.length > 0 && (
+                    {msg.triageResult.specialty_needed && msg.triageResult.specialty_needed.length > 0 && (
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-xs text-slate-700 dark:text-slate-400 font-bold">Chuyên khoa phù hợp:</span>
+                        <span className="text-xs text-slate-700 font-bold">Chuyên khoa phù hợp:</span>
                         {msg.triageResult.specialty_needed.map((spec: string, idx: number) => (
                           <span
                             key={idx}
-                            className="px-2.5 py-0.5 bg-emerald-100 dark:bg-sky-500/20 text-emerald-950 dark:text-sky-300 text-xs font-bold rounded-lg border border-emerald-300 dark:border-sky-500/30"
+                            className="px-2.5 py-0.5 bg-emerald-100 text-emerald-950 text-xs font-bold rounded-lg border border-emerald-300"
                           >
                             {spec}
                           </span>
@@ -339,9 +342,9 @@ export const ChatPage = ({
 
                     {/* Bright Light Mint Green Suggested Action Disclaimer Box */}
                     {msg.triageResult.suggested_action && (
-                      <div className="bg-emerald-100/80 border border-emerald-300 dark:bg-slate-950 dark:border-slate-800 p-3 rounded-xl text-xs text-emerald-950 dark:text-slate-300 flex items-start gap-2 shadow-xs mt-2 font-bold">
-                        <Info className="w-4 h-4 text-emerald-700 dark:text-sky-400 shrink-0 mt-0.5" />
-                        <span className="font-bold text-emerald-950 dark:text-slate-200">{msg.triageResult.suggested_action}</span>
+                      <div className="bg-emerald-100/80 border border-emerald-300 p-3 rounded-xl text-xs text-emerald-950 flex items-start gap-2 shadow-xs mt-2 font-bold">
+                        <Info className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
+                        <span className="font-bold text-emerald-950">{msg.triageResult.suggested_action}</span>
                       </div>
                     )}
                   </div>
@@ -351,11 +354,11 @@ export const ChatPage = ({
               {/* Recommended Hospital List inside Chat */}
               {msg.recommendedHospitals && msg.recommendedHospitals.length > 0 && (
                 <div className="space-y-3 pt-1">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-sky-400 flex items-center gap-1.5 pl-1">
-                    <HospitalIcon className="w-4 h-4 text-emerald-700 dark:text-sky-400" /> Bệnh viện xếp hạng cao nhất tại Bình Thạnh:
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-800 flex items-center gap-1.5 pl-1">
+                    <HospitalIcon className="w-4 h-4 text-emerald-700" /> Bệnh viện xếp hạng cao nhất tại Bình Thạnh:
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {msg.recommendedHospitals.map((hosp) => (
+                    {msg.recommendedHospitals.map((hosp: Hospital) => (
                       <HospitalCard
                         key={hosp.id}
                         hospital={hosp}
@@ -371,8 +374,8 @@ export const ChatPage = ({
         ))}
 
         {isLoading && (
-          <div className="flex items-center gap-3 p-4 bg-emerald-100 dark:bg-slate-900 rounded-2xl max-w-xs text-emerald-950 dark:text-slate-300 text-xs border border-emerald-300 dark:border-slate-800 shadow-xl font-bold">
-            <Sparkles className="w-5 h-5 text-emerald-700 dark:text-sky-400 animate-spin" />
+          <div className="flex items-center gap-3 p-4 bg-emerald-100 rounded-2xl max-w-xs text-emerald-950 text-xs border border-emerald-300 shadow-xl font-bold">
+            <Sparkles className="w-5 h-5 text-emerald-700 animate-spin" />
             <span>Google Gemini Flash Vision AI đang xử lý...</span>
           </div>
         )}
@@ -380,8 +383,8 @@ export const ChatPage = ({
         <div ref={messagesEndRef} />
       </div>
 
-      {/* 3. FIXED ALWAYS-VISIBLE BOTTOM CHAT INPUT CONTAINER WITH SPRING POP-OUT ANIMATED COMBOBOX */}
-      <div className="sticky bottom-0 left-0 right-0 p-3 sm:p-4 bg-emerald-100/90 dark:bg-slate-900/95 backdrop-blur-xl border-t border-emerald-300 dark:border-slate-800 z-30 shadow-2xl shrink-0 space-y-2">
+      {/* 3. FIXED ALWAYS-VISIBLE BOTTOM CHAT INPUT CONTAINER */}
+      <div className="sticky bottom-0 left-0 right-0 p-3 sm:p-4 bg-emerald-100/90 backdrop-blur-xl border-t border-emerald-300 z-30 shadow-2xl shrink-0 space-y-2">
         {/* Selected Image Thumbnail Preview Bar */}
         {selectedImage && (
           <div className="mb-2 relative inline-block group">
@@ -422,11 +425,11 @@ export const ChatPage = ({
             className={`image-upload-btn p-3 rounded-xl border transition-all cursor-pointer shrink-0 flex items-center justify-center ${
               selectedImage
                 ? 'bg-emerald-600 text-white border-emerald-500 shadow-md'
-                : 'bg-emerald-100 text-emerald-950 border-emerald-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 hover:bg-emerald-200 shadow-xs'
+                : 'bg-emerald-100 text-emerald-950 border-emerald-300 hover:bg-emerald-200 shadow-xs'
             }`}
             title="Đính kèm ảnh triệu chứng / vết thương / toa thuốc"
           >
-            <ImageIcon className="w-4 h-4 text-emerald-800 dark:text-slate-300" />
+            <ImageIcon className="w-4 h-4 text-emerald-800" />
           </button>
 
           <div className="relative flex-1">
@@ -442,7 +445,7 @@ export const ChatPage = ({
                   ? 'Mô tả triệu chứng, chọn/dán ảnh (Ctrl+V) để AI phân tích...'
                   : 'Nhập tình trạng cần hướng dẫn sơ cứu khẩn cấp...'
               }
-              className="w-full py-3 pl-4 pr-10 rounded-xl bg-white dark:bg-slate-950 border border-emerald-300 dark:border-slate-700/90 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 text-sm shadow-sm transition-all font-bold"
+              className="w-full py-3 pl-4 pr-10 rounded-xl bg-white border border-emerald-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-500 text-sm shadow-sm transition-all font-bold"
             />
           </div>
 
@@ -461,7 +464,7 @@ export const ChatPage = ({
           <button
             type="button"
             onClick={toggleDropdown}
-            className="py-1.5 px-3.5 rounded-xl bg-white dark:bg-slate-800 hover:bg-emerald-100/80 dark:hover:bg-slate-700 border border-emerald-300 dark:border-slate-700 text-slate-900 dark:text-white font-bold text-xs flex items-center gap-2 shadow-sm transition-all active:scale-95 cursor-pointer"
+            className="py-1.5 px-3.5 rounded-xl bg-white hover:bg-emerald-100 border border-emerald-300 text-slate-900 font-bold text-xs flex items-center gap-2 shadow-sm transition-all active:scale-95 cursor-pointer"
             title="Đổi Chế độ AI (ChatGPT Model Picker Style)"
           >
             <CurrentModeIcon className={`w-3.5 h-3.5 ${currentModeInfo.color}`} />
@@ -469,19 +472,19 @@ export const ChatPage = ({
             <ChevronDown className={`w-3.5 h-3.5 text-slate-500 transition-transform duration-300 ease-out ${isDropdownAnimating ? 'rotate-180 text-emerald-600' : ''}`} />
           </button>
 
-          {/* Liquid Spring Pop-out Dropdown Popup sprouting seamlessly from button */}
+          {/* Liquid Spring Pop-out Dropdown Popup */}
           {isDropdownRendered && (
             <div
               style={{
                 transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
               }}
-              className={`absolute bottom-full left-0 mb-2 w-72 sm:w-80 rounded-2xl bg-white dark:bg-slate-900 backdrop-blur-2xl border-2 border-emerald-400 dark:border-slate-700 shadow-2xl p-2 z-50 transition-all duration-300 origin-bottom-left ${
+              className={`absolute bottom-full left-0 mb-2 w-72 sm:w-80 rounded-2xl bg-white backdrop-blur-2xl border-2 border-emerald-400 shadow-2xl p-2 z-50 transition-all duration-300 origin-bottom-left ${
                 isDropdownAnimating
                   ? 'opacity-100 scale-100 translate-y-0 blur-none'
                   : 'opacity-0 scale-[0.82] translate-y-3 blur-xs pointer-events-none'
               }`}
             >
-              <div className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-3 py-1.5 border-b border-emerald-200 dark:border-slate-800 mb-1 flex items-center justify-between">
+              <div className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 px-3 py-1.5 border-b border-emerald-200 mb-1 flex items-center justify-between">
                 <span>Chọn Chế độ AI</span>
                 <span className="text-[9px] bg-emerald-100 text-emerald-900 px-1.5 py-0.5 rounded font-extrabold">Gemini Vision</span>
               </div>
@@ -499,20 +502,20 @@ export const ChatPage = ({
                       }}
                       className={`w-full text-left p-2.5 rounded-xl transition-all cursor-pointer flex items-start gap-2.5 ${
                         isSelected
-                          ? 'bg-emerald-100 dark:bg-slate-800 text-emerald-950 dark:text-white font-bold border border-emerald-400 dark:border-slate-700 shadow-xs'
-                          : 'hover:bg-emerald-50 dark:hover:bg-slate-800/60 text-slate-800 dark:text-slate-300 border border-transparent'
+                          ? 'bg-emerald-100 text-emerald-950 font-bold border border-emerald-400 shadow-xs'
+                          : 'hover:bg-emerald-50 text-slate-800 border border-transparent'
                       }`}
                     >
-                      <div className={`p-1.5 rounded-lg shrink-0 ${isSelected ? 'bg-emerald-600 text-white' : 'bg-emerald-100 dark:bg-slate-800 text-emerald-700 dark:text-slate-300'}`}>
+                      <div className={`p-1.5 rounded-lg shrink-0 ${isSelected ? 'bg-emerald-600 text-white' : 'bg-emerald-100 text-emerald-700'}`}>
                         <Icon className="w-4 h-4" />
                       </div>
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
                           <h5 className="font-extrabold text-xs leading-tight">{mode.label}</h5>
-                          {isSelected && <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />}
+                          {isSelected && <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />}
                         </div>
-                        <p className="text-[10px] text-slate-600 dark:text-slate-400 font-medium leading-tight mt-0.5">{mode.desc}</p>
+                        <p className="text-[10px] text-slate-600 font-medium leading-tight mt-0.5">{mode.desc}</p>
                       </div>
                     </button>
                   );

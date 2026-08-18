@@ -12,13 +12,13 @@ export class ChatMessage {
   @Column('text')
   text: string;
 
-  @Column({ name: 'image_url', nullable: true })
-  imageUrl: string;
+  @Column({ type: 'text', name: 'image_url', nullable: true })
+  imageUrl: string | null;
 
-  @Column('jsonb', { name: 'triage_result', nullable: true })
+  @Column('simple-json', { name: 'triage_result', nullable: true })
   triageResult: any;
 
-  @Column('jsonb', { name: 'recommended_hospitals', nullable: true })
+  @Column('simple-json', { name: 'recommended_hospitals', nullable: true })
   recommendedHospitals: any;
 
   @CreateDateColumn({ name: 'created_at' })
