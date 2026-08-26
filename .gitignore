@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Production build outputs
+dist/
+client/dist/
+server/dist/
+build/
+
+# Environment & Secret files
+.env
+server/.env
+client/.env
+
+# Zip artifacts & temporary logs
+*.zip
+*.log
+.DS_Store
