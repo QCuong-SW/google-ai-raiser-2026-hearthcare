@@ -1,0 +1,14 @@
+{
+  "name": "google-ai-raiser-2026-hearthcare",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LifeLink AI - Emergency Medical Triage & Hospital Ranking",
+  "scripts": {
+    "postinstall": "npm --prefix client install",
+    "build": "npm --prefix client run build",
+    "start": "npm --prefix client run preview"
+  },
+  "dependencies": {
+    "client": "file:client"
+  }
+}
